@@ -41,21 +41,6 @@ a {
   flex: 1 1 320px;
 }
 
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 32px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .eyebrow {
   text-transform: uppercase;
   font-size: 12px;
@@ -76,8 +61,6 @@ a {
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 18px 35px rgba(15, 23, 42, 0.2);
-  display: grid;
-  gap: 16px;
 }
 
 .price-row {
@@ -97,6 +80,12 @@ a {
   font-weight: 700;
 }
 
+.price-form label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
 .inline-input {
   display: flex;
   gap: 12px;
@@ -110,10 +99,6 @@ a {
   font-size: 12px;
   opacity: 0.7;
   margin-top: 8px;
-}
-
-.helper-block {
-  margin-top: 12px;
 }
 
 main {
@@ -153,8 +138,7 @@ input {
   background: #f8f9ff;
 }
 
-button,
-.link-button {
+button {
   padding: 10px 18px;
   border-radius: 999px;
   border: none;
@@ -162,14 +146,9 @@ button,
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
-button:hover,
-.link-button:hover {
+button:hover {
   background: #2f4be5;
 }
 
@@ -184,15 +163,23 @@ button:hover,
   color: #6b7280;
 }
 
-.error {
-  color: #b91c1c;
-  font-weight: 600;
+.user-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.user-card header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
 }
 
 .user-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 12px;
+  margin-bottom: 20px;
 }
 
 .summary-label {
@@ -210,6 +197,7 @@ button:hover,
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 20px;
 }
 
 .user-history {
@@ -233,33 +221,12 @@ button:hover,
   font-size: 14px;
 }
 
-.driver-grid {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-.driver-card {
-  display: grid;
-  gap: 16px;
-}
-
-.admin-panel {
-  display: grid;
-  gap: 24px;
-}
-
-.hidden {
-  display: none;
-}
-
 @media (max-width: 720px) {
   body {
     padding: 24px 20px 60px;
   }
 
-  .hero,
-  .page-header {
+  .hero {
     flex-direction: column;
   }
 }

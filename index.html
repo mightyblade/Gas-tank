@@ -12,8 +12,8 @@
         <p class="eyebrow">Gas Tank Tracker</p>
         <h1>Track fuel usage, payments, and balances for multiple drivers.</h1>
         <p class="subhead">
-          View each driver on their own page, log fuel usage and payments, and
-          keep balances in sync.
+          Add users, log fuel usage, record payments, and update the current gas
+          price in one place.
         </p>
       </div>
       <div class="price-card">
@@ -22,21 +22,102 @@
           <span class="price-label">$ / unit</span>
           <span id="current-price" class="price-value">0.00</span>
         </div>
-        <a class="link-button" href="admin.html">Admin settings</a>
+        <form id="price-form" class="price-form">
+          <label for="price-input">Update price</label>
+          <div class="inline-input">
+            <input id="price-input" type="number" min="0" step="0.01" required />
+            <button type="submit">Save</button>
+          </div>
+          <p class="helper">
+            New entries will use the latest price. Existing entries keep their
+            original price.
+          </p>
+        </form>
       </div>
     </header>
 
     <main>
+      <section class="card">
+        <h2>Add a driver</h2>
+        <form id="user-form" class="stack">
+          <label for="user-name">Driver name</label>
+          <input id="user-name" type="text" placeholder="e.g. Alex" required />
+          <button type="submit">Add driver</button>
+        </form>
+      </section>
+
       <section>
         <div class="section-header">
           <h2>Drivers</h2>
-          <p class="muted">Select a driver to view their balance and history.</p>
+          <p class="muted">Track fuel usage, payments, and balances by driver.</p>
         </div>
-        <div id="driver-list" class="driver-grid"></div>
+        <div id="user-list" class="user-grid"></div>
       </section>
     </main>
 
-    <script src="common.js"></script>
-    <script src="landing.js"></script>
+    <template id="user-card-template">
+      <article class="card user-card">
+        <header>
+          <h3 class="user-name"></h3>
+          <p class="muted user-id"></p>
+        </header>
+        <div class="user-summary">
+          <div>
+            <p class="summary-label">Total fuel</p>
+            <p class="summary-value" data-summary="fuel">0</p>
+          </div>
+          <div>
+            <p class="summary-label">Total owed</p>
+            <p class="summary-value" data-summary="owed">$0.00</p>
+          </div>
+          <div>
+            <p class="summary-label">Total paid</p>
+            <p class="summary-value" data-summary="paid">$0.00</p>
+          </div>
+          <div>
+            <p class="summary-label">Balance</p>
+            <p class="summary-value" data-summary="balance">$0.00</p>
+          </div>
+        </div>
+        <div class="user-actions">
+          <form class="stack fuel-form">
+            <h4>Add fuel entry</h4>
+            <label>
+              Amount used
+              <input type="number" min="0" step="0.01" name="amount" required />
+            </label>
+            <label>
+              Date
+              <input type="date" name="date" required />
+            </label>
+            <button type="submit">Log fuel</button>
+          </form>
+          <form class="stack payment-form">
+            <h4>Add payment</h4>
+            <label>
+              Amount paid
+              <input type="number" min="0" step="0.01" name="amount" required />
+            </label>
+            <label>
+              Date
+              <input type="date" name="date" required />
+            </label>
+            <button type="submit">Record payment</button>
+          </form>
+        </div>
+        <div class="user-history">
+          <div>
+            <h4>Fuel history</h4>
+            <ul class="history-list" data-history="fuel"></ul>
+          </div>
+          <div>
+            <h4>Payment history</h4>
+            <ul class="history-list" data-history="payment"></ul>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
   </body>
 </html>
