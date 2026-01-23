@@ -6,21 +6,38 @@ A lightweight browser app for tracking fuel usage, payments, and balances for mu
 
 - Separate landing page with links to each driver.
 - Dedicated driver pages for logging fuel usage and payments.
-- Admin-only page for adding drivers and updating gas price.
-- Data persists locally in the browser via `localStorage`.
+- Admin-only page for adding drivers, updating gas price, and deleting logs.
+- Shared data stored in MySQL (no local-only storage).
 
 ## Pages
 
 - `index.html` — landing page with driver links.
 - `driver.html?id=<driver-id>` — per-driver page.
-- `admin.html` — password-protected admin settings.
+- `admin.html` — admin settings.
+- `login.html` — driver login.
 
-## Getting started
+## DreamHost setup
 
-Open `index.html` directly in a browser or serve the directory with a simple web server:
+1. Create a MySQL database in the DreamHost panel.
+2. Import the schema:
 
-```bash
-python -m http.server 8000
+```sql
+-- Run this in phpMyAdmin or the MySQL command line.
+SOURCE schema.sql;
 ```
 
-Then visit `http://localhost:8000`.
+3. Copy `config.php.example` to `config.php` and fill in your MySQL credentials.
+4. Upload the site to your DreamHost domain (including the `api` folder).
+
+## Passwords
+
+- The first time you log in as **admin**, the password you enter is saved as the admin password.
+- The admin can set the driver password from the admin page.
+
+## Getting started (local)
+
+```bash
+php -S localhost:8000
+```
+
+Then visit `http://localhost:8000/login.html`.

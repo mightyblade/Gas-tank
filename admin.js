@@ -1,142 +1,171 @@
-const state = loadState();
-const authPanel = document.querySelector("#auth-panel");
-const adminPanel = document.querySelector("#admin-panel");
-const priceForm = document.querySelector("#price-form");
-const priceInput = document.querySelector("#price-input");
-const currentPrice = document.querySelector("#current-price");
-const userForm = document.querySelector("#user-form");
-const userNameInput = document.querySelector("#user-name");
-const driverAdminList = document.querySelector("#driver-admin-list");
-
-const ADMIN_SESSION_KEY = "gas-tank-admin-session";
+const authPanel = document.querySelector('#auth-panel');
+const adminPanel = document.querySelector('#admin-panel');
+const priceForm = document.querySelector('#price-form');
+const priceInput = document.querySelector('#price-input');
+const currentPrice = document.querySelector('#current-price');
+const userForm = document.querySelector('#user-form');
+const userNameInput = document.querySelector('#user-name');
+const driverAdminList = document.querySelector('#driver-admin-list');
+const logoutButton = document.querySelector('#admin-logout');
+const adminPasswordForm = document.querySelector('#admin-password-form');
+const adminPasswordInput = document.querySelector('#admin-password');
+const userPasswordForm = document.querySelector('#user-password-form');
+const userPasswordInput = document.querySelector('#user-password');
 
 init();
 
-function init() {
-  if (!state.adminPassword) {
-    renderPasswordSetup();
-    return;
-  }
-
-  if (sessionStorage.getItem(ADMIN_SESSION_KEY) === "true") {
-    unlockAdmin();
-    return;
-  }
-
-  renderPasswordPrompt();
-}
-
-function renderPasswordSetup() {
-  authPanel.innerHTML = `
-    <h2>Set admin password</h2>
-    <p class="muted">This password is stored locally in your browser.</p>
-    <form id="password-setup" class="stack">
-      <label for="password-input">New password</label>
-      <input id="password-input" type="password" required />
-      <button type="submit">Save password</button>
-    </form>
-  `;
-
-  const setupForm = authPanel.querySelector("#password-setup");
-  setupForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const password = authPanel
-      .querySelector("#password-input")
-      .value.trim();
-    if (!password) {
+async function init() {
+  try {
+    if (shouldUseDemoData()) {
+      renderAdmin(demoData());
       return;
     }
-    state.adminPassword = password;
-    saveState(state);
-    sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
-    unlockAdmin();
-  });
+
+    const role = await getSessionRole();
+    if (role !== 'admin') {
+      renderLogin();
+      return;
+    }
+
+    await renderAdmin(await loadAdminData());
+  } catch (error) {
+    renderError(error.message);
+  }
 }
 
-function renderPasswordPrompt() {
+function renderLogin() {
   authPanel.innerHTML = `
     <h2>Admin login</h2>
     <p class="muted">Enter the admin password to continue.</p>
-    <form id="password-login" class="stack">
-      <label for="password-login-input">Password</label>
-      <input id="password-login-input" type="password" required />
+    <form id="admin-login" class="stack">
+      <label for="admin-login-input">Password</label>
+      <input id="admin-login-input" type="password" required />
       <button type="submit">Unlock</button>
     </form>
+    <p id="login-error" class="error hidden"></p>
   `;
 
-  const loginForm = authPanel.querySelector("#password-login");
-  loginForm.addEventListener("submit", (event) => {
+  const loginForm = authPanel.querySelector('#admin-login');
+  const errorText = authPanel.querySelector('#login-error');
+  loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const password = authPanel
-      .querySelector("#password-login-input")
-      .value.trim();
-    if (password !== state.adminPassword) {
-      authPanel.querySelector("#password-login-input").value = "";
-      const error = document.createElement("p");
-      error.className = "error";
-      error.textContent = "Incorrect password. Try again.";
-      authPanel.appendChild(error);
-      return;
+    errorText.classList.add('hidden');
+    try {
+      await apiLogin('admin', authPanel.querySelector('#admin-login-input').value);
+      await renderAdmin(await loadAdminData());
+    } catch (error) {
+      errorText.textContent = error.message;
+      errorText.classList.remove('hidden');
     }
-    sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
-    unlockAdmin();
   });
 }
 
-function unlockAdmin() {
-  authPanel.classList.add("hidden");
-  adminPanel.classList.remove("hidden");
-  currentPrice.textContent = formatCurrency(state.gasPrice);
-  renderDriverList();
+async function loadAdminData() {
+  const [pricePayload, driversPayload] = await Promise.all([
+    apiRequest('gas-price.php', { method: 'GET' }),
+    apiRequest('drivers.php', { method: 'GET' }),
+  ]);
 
-  priceForm.addEventListener("submit", (event) => {
+  return {
+    gasPrice: pricePayload.gasPrice,
+    drivers: driversPayload.drivers,
+  };
+}
+
+async function renderAdmin(data) {
+  authPanel.classList.add('hidden');
+  adminPanel.classList.remove('hidden');
+  currentPrice.textContent = formatCurrency(data.gasPrice);
+  renderDriverList(data.drivers);
+
+  priceForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const value = Number.parseFloat(priceInput.value);
     if (Number.isNaN(value)) {
       return;
     }
-    state.gasPrice = value;
-    priceInput.value = "";
-    saveState(state);
-    currentPrice.textContent = formatCurrency(state.gasPrice);
+    const payload = await apiRequest('gas-price.php', {
+      method: 'POST',
+      body: JSON.stringify({ gasPrice: value }),
+    });
+    priceInput.value = '';
+    currentPrice.textContent = formatCurrency(payload.gasPrice);
   });
 
-  userForm.addEventListener("submit", (event) => {
+  userForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = userNameInput.value.trim();
     if (!name) {
       return;
     }
-    state.users.push({
-      id: crypto.randomUUID(),
-      name,
-      fuelEntries: [],
-      payments: [],
+    await apiRequest('drivers.php', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
     });
-    userNameInput.value = "";
-    saveState(state);
-    renderDriverList();
+    userNameInput.value = '';
+    renderDriverList((await loadAdminData()).drivers);
+  });
+
+  adminPasswordForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await apiRequest('set-admin-password.php', {
+      method: 'POST',
+      body: JSON.stringify({ password: adminPasswordInput.value }),
+    });
+    adminPasswordInput.value = '';
+  });
+
+  userPasswordForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await apiRequest('set-user-password.php', {
+      method: 'POST',
+      body: JSON.stringify({ password: userPasswordInput.value }),
+    });
+    userPasswordInput.value = '';
   });
 }
 
-function renderDriverList() {
-  driverAdminList.innerHTML = "";
+logoutButton.addEventListener('click', async () => {
+  try {
+    await apiLogout();
+  } finally {
+    window.location.href = 'admin.html';
+  }
+});
 
-  if (state.users.length === 0) {
-    const empty = document.createElement("li");
-    empty.className = "history-item";
-    empty.textContent = "No drivers yet.";
+function renderDriverList(drivers) {
+  driverAdminList.innerHTML = '';
+
+  if (drivers.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'history-item';
+    empty.textContent = 'No drivers yet.';
     driverAdminList.appendChild(empty);
     return;
   }
 
-  state.users.forEach((user) => {
-    const item = document.createElement("li");
-    item.className = "history-item";
+  drivers.forEach((driver) => {
+    const item = document.createElement('li');
+    item.className = 'history-item history-item-row';
     item.innerHTML = `
-      <strong>${user.name}</strong>
-      <div class="muted">Driver ID: ${user.id}</div>
+      <div>
+        <strong>${driver.name}</strong>
+        <div class="muted">Driver ID: ${driver.id}</div>
+      </div>
+      <button class="link-button danger" data-delete-driver="${driver.id}">Delete</button>
     `;
     driverAdminList.appendChild(item);
   });
+
+  driverAdminList.querySelectorAll('[data-delete-driver]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const id = button.getAttribute('data-delete-driver');
+      await apiRequest(`drivers.php?id=${id}`, { method: 'DELETE' });
+      renderDriverList((await loadAdminData()).drivers);
+    });
+  });
+}
+
+function renderError(message) {
+  authPanel.innerHTML = `<p class="error">${message}</p>`;
 }

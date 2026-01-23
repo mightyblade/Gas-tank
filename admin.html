@@ -17,6 +17,7 @@
       </div>
       <div class="header-actions">
         <a class="link-button" href="index.html">Back to landing page</a>
+        <button id="admin-logout" type="button">Log out</button>
       </div>
     </header>
 
@@ -46,6 +47,20 @@
           <div class="helper-block">
             <p class="muted">Share the driver page link from the landing page.</p>
           </div>
+        </div>
+
+        <div class="card">
+          <h2>Passwords</h2>
+          <form id="admin-password-form" class="stack">
+            <label for="admin-password">Reset admin password</label>
+            <input id="admin-password" type="password" required />
+            <button type="submit">Update admin password</button>
+          </form>
+          <form id="user-password-form" class="stack">
+            <label for="user-password">Set driver password</label>
+            <input id="user-password" type="password" required />
+            <button type="submit">Update driver password</button>
+          </form>
         </div>
 
         <div class="card">
