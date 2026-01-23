@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Gas Tank Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h1>Manage drivers and gas price</h1>
+        <p class="subhead">
+          This page is password protected to avoid accidental changes.
+        </p>
+      </div>
+      <div class="header-actions">
+        <a class="link-button" href="index.html">Back to landing page</a>
+        <button id="admin-logout" type="button">Log out</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="auth-panel" class="card"></section>
+      <section id="admin-panel" class="admin-panel hidden">
+        <div class="card">
+          <h2>Current gas price</h2>
+          <div class="price-row">
+            <span class="price-label">$ / unit</span>
+            <span id="current-price" class="price-value">0.00</span>
+          </div>
+          <form id="price-form" class="stack">
+            <label for="price-input">Update price</label>
+            <input id="price-input" type="number" min="0" step="0.01" required />
+            <button type="submit">Save new price</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Add a driver</h2>
+          <form id="user-form" class="stack">
+            <label for="user-name">Driver name</label>
+            <input id="user-name" type="text" placeholder="e.g. Alex" required />
+            <button type="submit">Add driver</button>
+          </form>
+          <div class="helper-block">
+            <p class="muted">Share the driver page link from the landing page.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Passwords</h2>
+          <form id="admin-password-form" class="stack">
+            <label for="admin-password">Reset admin password</label>
+            <input id="admin-password" type="password" required />
+            <button type="submit">Update admin password</button>
+          </form>
+          <form id="user-password-form" class="stack">
+            <label for="user-password">Set driver password</label>
+            <input id="user-password" type="password" required />
+            <button type="submit">Update driver password</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Drivers</h2>
+          <ul id="driver-admin-list" class="history-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script src="common.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
