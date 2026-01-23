@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver | Gas Tank Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Driver</p>
+        <h1 id="driver-name">Driver</h1>
+        <p id="driver-meta" class="muted"></p>
+      </div>
+      <div class="header-actions">
+        <a class="link-button" href="index.html">Back to landing page</a>
+        <button id="logout" type="button">Log out</button>
+      </div>
+    </header>
+
+    <main class="driver-layout">
+      <section class="card" id="recent-fuel-all"></section>
+      <section class="card" id="driver-fuel-entry"></section>
+      <section class="card" id="driver-summary"></section>
+      <section class="card" id="driver-payment"></section>
+      <section class="card driver-full" id="driver-history"></section>
+    </main>
+
+    <script src="common.js"></script>
+    <script src="driver.js"></script>
+  </body>
+</html>
