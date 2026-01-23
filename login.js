@@ -29,6 +29,12 @@ loginForm.addEventListener('submit', async (event) => {
       return;
     }
 
+    if (!driverSelect.value) {
+      errorText.textContent = 'Please select a driver.';
+      errorText.classList.remove('hidden');
+      return;
+    }
+
     const payload = await apiLogin('user', passwordInput.value, driverSelect.value);
     window.location.href = `driver.html?id=${payload.driverId}`;
   } catch (error) {
@@ -55,4 +61,8 @@ function populateDrivers(drivers) {
     option.textContent = driver.name;
     driverSelect.appendChild(option);
   });
+
+  if (driverSelect.value === '' && drivers.length > 0) {
+    driverSelect.value = drivers[0].id;
+  }
 }
