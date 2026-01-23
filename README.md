@@ -14,7 +14,7 @@ A lightweight browser app for tracking fuel usage, payments, and balances for mu
 - `index.html` — landing page with driver links.
 - `driver.html?id=<driver-id>` — per-driver page.
 - `admin.html` — admin settings.
-- `login.html` — driver login.
+- `login.html` — driver login (select driver, then sign in).
 
 ## DreamHost setup
 
@@ -32,7 +32,8 @@ SOURCE schema.sql;
 ## Passwords
 
 - The first time you log in as **admin**, the password you enter is saved as the admin password.
-- The admin can set the driver password from the admin page.
+- Each driver has their own password; set it from the admin page under Drivers.
+- Drivers log in and are taken directly to their driver page, with optional access to the landing page.
 
 ## Getting started (local)
 
@@ -41,3 +42,11 @@ php -S localhost:8000
 ```
 
 Then visit `http://localhost:8000/login.html`.
+
+## Database updates
+
+If you already created the tables before adding driver passwords, run:
+
+```sql
+ALTER TABLE drivers ADD COLUMN password_hash VARCHAR(255) DEFAULT NULL;
+```

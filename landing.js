@@ -1,6 +1,7 @@
 const driverList = document.querySelector('#driver-list');
 const currentPrice = document.querySelector('#current-price');
 const logoutButton = document.querySelector('#logout');
+const recentFuelList = document.querySelector('#recent-fuel-list');
 
 init();
 
@@ -17,14 +18,16 @@ async function init() {
       return;
     }
 
-    const [pricePayload, driversPayload] = await Promise.all([
+    const [pricePayload, driversPayload, recentFuelPayload] = await Promise.all([
       apiRequest('gas-price.php', { method: 'GET' }),
       apiRequest('drivers.php', { method: 'GET' }),
+      apiRequest('recent-fuel.php', { method: 'GET' }),
     ]);
 
     renderLanding({
       gasPrice: pricePayload.gasPrice,
       drivers: driversPayload.drivers,
+      recentFuel: recentFuelPayload.entries,
     });
   } catch (error) {
     renderError(error.message);
@@ -40,7 +43,8 @@ logoutButton.addEventListener('click', async () => {
 });
 
 function renderLanding(data) {
-  currentPrice.textContent = formatCurrency(data.gasPrice);
+  currentPrice.textContent = formatPrice(data.gasPrice);
+  renderRecentFuel(data.recentFuel);
   driverList.innerHTML = '';
 
   if (data.drivers.length === 0) {
@@ -71,6 +75,24 @@ function renderLanding(data) {
     `;
 
     driverList.appendChild(card);
+  });
+}
+
+function renderRecentFuel(entries = []) {
+  recentFuelList.innerHTML = '';
+  if (!entries.length) {
+    const empty = document.createElement('li');
+    empty.className = 'history-item';
+    empty.textContent = 'No fuel entries yet.';
+    recentFuelList.appendChild(empty);
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const item = document.createElement('li');
+    item.className = 'history-item';
+    item.textContent = `${entry.driver_name} — ${formatFuelEntry(entry)}`;
+    recentFuelList.appendChild(item);
   });
 }
 

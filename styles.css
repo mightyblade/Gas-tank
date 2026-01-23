@@ -157,7 +157,8 @@ button {
   font: inherit;
 }
 
-input {
+input,
+select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
@@ -243,6 +244,14 @@ button.danger:hover {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.button-danger {
+  background: #dc2626;
+}
+
+.button-danger:hover {
+  background: #b91c1c;
+}
+
 .user-history {
   display: grid;
   gap: 20px;
@@ -271,6 +280,37 @@ button.danger:hover {
   gap: 12px;
 }
 
+.history-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 999;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .driver-grid {
   display: grid;
   gap: 20px;
@@ -290,7 +330,7 @@ button.danger:hover {
 .driver-layout {
   display: grid;
   gap: 24px;
-  grid-template-columns: minmax(260px, 1fr) minmax(320px, 2fr);
+  grid-template-columns: 1fr;
 }
 
 .driver-full {

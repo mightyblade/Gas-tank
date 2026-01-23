@@ -75,7 +75,7 @@ async function loadAdminData() {
 async function renderAdmin(data) {
   authPanel.classList.add('hidden');
   adminPanel.classList.remove('hidden');
-  currentPrice.textContent = formatCurrency(data.gasPrice);
+  currentPrice.textContent = formatPrice(data.gasPrice);
   renderDriverList(data.drivers);
 
   priceForm.addEventListener('submit', async (event) => {
@@ -89,7 +89,7 @@ async function renderAdmin(data) {
       body: JSON.stringify({ gasPrice: value }),
     });
     priceInput.value = '';
-    currentPrice.textContent = formatCurrency(payload.gasPrice);
+    currentPrice.textContent = formatPrice(payload.gasPrice);
   });
 
   userForm.addEventListener('submit', async (event) => {
@@ -152,9 +152,26 @@ function renderDriverList(drivers) {
         <strong>${driver.name}</strong>
         <div class="muted">Driver ID: ${driver.id}</div>
       </div>
-      <button class="link-button danger" data-delete-driver="${driver.id}">Delete</button>
+      <div class="history-actions">
+        <button class="link-button" data-set-driver-password="${driver.id}">Set password</button>
+        <button class="link-button danger" data-delete-driver="${driver.id}">Delete</button>
+      </div>
     `;
     driverAdminList.appendChild(item);
+  });
+
+  driverAdminList.querySelectorAll('[data-set-driver-password]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const id = button.getAttribute('data-set-driver-password');
+      const password = window.prompt('Enter a new password for this driver');
+      if (!password) {
+        return;
+      }
+      await apiRequest('driver-password.php', {
+        method: 'POST',
+        body: JSON.stringify({ driverId: id, password }),
+      });
+    });
   });
 
   driverAdminList.querySelectorAll('[data-delete-driver]').forEach((button) => {

@@ -19,7 +19,7 @@
       <div class="price-card">
         <h2>Current gas price</h2>
         <div class="price-row">
-          <span class="price-label">$ / unit</span>
+          <span class="price-label">$ / liter</span>
           <span id="current-price" class="price-value">0.00</span>
         </div>
         <div class="hero-actions">
@@ -30,6 +30,13 @@
     </header>
 
     <main>
+      <section class="card" id="recent-fuel-section">
+        <div class="card-header">
+          <h2>Recent fuel entries</h2>
+          <p class="muted">Latest activity across all drivers.</p>
+        </div>
+        <ul id="recent-fuel-list" class="history-list"></ul>
+      </section>
       <section>
         <div class="section-header">
           <h2>Drivers</h2>

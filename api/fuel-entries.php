@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    require_role('admin');
+  require_role('admin');
     parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
     $entryId = $params['id'] ?? null;
     if (!$entryId) {
@@ -27,7 +27,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     }
     $stmt = $pdo->prepare('DELETE FROM fuel_entries WHERE id = ?');
     $stmt->execute([$entryId]);
-    respond(['deleted' => true]);
+  respond(['deleted' => true]);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    require_role('admin');
+    parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
+    $entryId = $params['id'] ?? null;
+    $input = json_input();
+    $amount = $input['amount'] ?? null;
+    $date = $input['date'] ?? null;
+    $price = $input['pricePerUnit'] ?? null;
+
+    if (!$entryId || !is_numeric($amount) || !$date || !is_numeric($price)) {
+        respond(['error' => 'Invalid input'], 400);
+    }
+
+    $stmt = $pdo->prepare('UPDATE fuel_entries SET amount = ?, entry_date = ?, price_per_unit = ? WHERE id = ?');
+    $stmt->execute([$amount, $date, $price, $entryId]);
+    respond(['updated' => true]);
 }
 
 respond(['error' => 'Method not allowed'], 405);

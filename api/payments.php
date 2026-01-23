@@ -29,4 +29,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     respond(['deleted' => true]);
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    require_role('admin');
+    parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
+    $paymentId = $params['id'] ?? null;
+    $input = json_input();
+    $amount = $input['amount'] ?? null;
+    $date = $input['date'] ?? null;
+
+    if (!$paymentId || !is_numeric($amount) || !$date) {
+        respond(['error' => 'Invalid input'], 400);
+    }
+
+    $stmt = $pdo->prepare('UPDATE payments SET amount = ?, entry_date = ? WHERE id = ?');
+    $stmt->execute([$amount, $date, $paymentId]);
+    respond(['updated' => true]);
+}
+
 respond(['error' => 'Method not allowed'], 405);

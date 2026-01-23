@@ -16,10 +16,10 @@ async function apiRequest(path, options = {}) {
   return payload;
 }
 
-async function apiLogin(role, password) {
+async function apiLogin(role, password, driverId = null) {
   return apiRequest('login.php', {
     method: 'POST',
-    body: JSON.stringify({ role, password }),
+    body: JSON.stringify({ role, password, driverId }),
   });
 }
 
@@ -32,8 +32,16 @@ async function getSessionRole() {
   return payload.role;
 }
 
+async function getSessionInfo() {
+  return apiRequest('status.php', { method: 'GET' });
+}
+
 function formatCurrency(value) {
   return `$${Number(value).toFixed(2)}`;
+}
+
+function formatPrice(value) {
+  return `$${Number(value).toFixed(4)}`;
 }
 
 function sum(values) {
@@ -41,7 +49,7 @@ function sum(values) {
 }
 
 function formatFuelEntry(entry) {
-  return `${entry.entry_date}: ${Number(entry.amount).toFixed(2)} units @ ${formatCurrency(
+  return `${entry.entry_date}: ${Number(entry.amount).toFixed(2)} liters @ ${formatPrice(
     entry.price_per_unit
   )} = ${formatCurrency(entry.amount * entry.price_per_unit)}`;
 }
@@ -79,5 +87,9 @@ function demoData() {
       ],
       payments: [{ id: 1, amount: 20.0, entry_date: '2024-03-15' }],
     },
+    recentFuel: [
+      { id: 4, driver_name: 'Casey', amount: 11.2, entry_date: '2024-03-18', price_per_unit: 3.52 },
+      { id: 3, driver_name: 'Alex', amount: 7.0, entry_date: '2024-03-12', price_per_unit: 3.45 },
+    ],
   };
 }
