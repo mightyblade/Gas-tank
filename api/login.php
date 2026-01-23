@@ -5,6 +5,7 @@ $input = json_input();
 $role = $input['role'] ?? '';
 $password = trim($input['password'] ?? '');
 $driverId = $input['driverId'] ?? null;
+$username = trim($input['username'] ?? '');
 
 if (!in_array($role, ['user', 'admin'], true)) {
     respond(['error' => 'Invalid role'], 400);
@@ -27,13 +28,13 @@ if ($role === 'admin') {
     respond(['role' => 'admin']);
 }
 
-if (!$driverId) {
-    respond(['error' => 'Driver selection required'], 400);
-}
-
-$stmt = $pdo->prepare('SELECT password_hash FROM drivers WHERE id = ?');
-$stmt->execute([$driverId]);
+$stmt = $pdo->prepare('SELECT id, password_hash FROM drivers WHERE username = ?');
+$stmt->execute([$username]);
 $row = $stmt->fetch();
+
+if ($username === '') {
+    respond(['error' => 'Username required'], 400);
+}
 
 if (!$row || !$row['password_hash']) {
     respond(['error' => 'Driver password not set. Ask admin to set it.'], 400);
@@ -44,5 +45,5 @@ if (!password_verify($password, $row['password_hash'])) {
 }
 
 $_SESSION['role'] = 'user';
-$_SESSION['driver_id'] = $driverId;
-respond(['role' => 'user', 'driverId' => $driverId]);
+$_SESSION['driver_id'] = $row['id'];
+respond(['role' => 'user', 'driverId' => $row['id']]);

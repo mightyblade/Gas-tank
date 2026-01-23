@@ -151,9 +151,10 @@ function renderDriverList(drivers) {
       <div>
         <strong>${driver.name}</strong>
         <div class="muted">Driver ID: ${driver.id}</div>
+        <div class="muted">Username: ${driver.username ?? 'Not set'}</div>
       </div>
       <div class="history-actions">
-        <button class="link-button" data-set-driver-password="${driver.id}">Set password</button>
+        <button class="link-button" data-set-driver-password="${driver.id}">Set login</button>
         <button class="link-button danger" data-delete-driver="${driver.id}">Delete</button>
       </div>
     `;
@@ -163,13 +164,17 @@ function renderDriverList(drivers) {
   driverAdminList.querySelectorAll('[data-set-driver-password]').forEach((button) => {
     button.addEventListener('click', async () => {
       const id = button.getAttribute('data-set-driver-password');
-      const password = window.prompt('Enter a new password for this driver');
+      const username = window.prompt('Enter a username for this driver');
+      if (!username) {
+        return;
+      }
+      const password = window.prompt('Enter a password for this driver');
       if (!password) {
         return;
       }
-      await apiRequest('driver-password.php', {
+      await apiRequest('driver-credentials.php', {
         method: 'POST',
-        body: JSON.stringify({ driverId: id, password }),
+        body: JSON.stringify({ driverId: id, username, password }),
       });
     });
   });

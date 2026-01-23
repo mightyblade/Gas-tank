@@ -3,7 +3,7 @@ require __DIR__ . '/bootstrap.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     require_any_role();
-    $stmt = $pdo->query('SELECT id, name, created_at FROM drivers ORDER BY created_at DESC');
+    $stmt = $pdo->query('SELECT id, name, username, created_at FROM drivers ORDER BY created_at DESC');
     $drivers = $stmt->fetchAll();
 
     $latestStmt = $pdo->prepare('SELECT * FROM fuel_entries WHERE driver_id = ? ORDER BY entry_date DESC, created_at DESC LIMIT 1');
@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($name === '') {
         respond(['error' => 'Name is required'], 400);
     }
-    $stmt = $pdo->prepare('INSERT INTO drivers (name) VALUES (?)');
-    $stmt->execute([$name]);
+    $stmt = $pdo->prepare('INSERT INTO drivers (name, username) VALUES (?, ?)');
+    $stmt->execute([$name, strtolower(preg_replace('/\s+/', '', $name))]);
     $driverId = $pdo->lastInsertId();
     respond(['id' => $driverId, 'name' => $name]);
 }

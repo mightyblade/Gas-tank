@@ -16,10 +16,10 @@ async function apiRequest(path, options = {}) {
   return payload;
 }
 
-async function apiLogin(role, password, driverId = null) {
+async function apiLogin(role, password, driverId = null, username = '') {
   return apiRequest('login.php', {
     method: 'POST',
-    body: JSON.stringify({ role, password, driverId }),
+    body: JSON.stringify({ role, password, driverId, username }),
   });
 }
 
