@@ -33,8 +33,10 @@ async function init() {
       return;
     }
 
-    await Promise.all([loadDriverData(), loadRecentFuelAll()]);
+    await loadDriverData();
     renderDriver();
+    await loadRecentFuelAll();
+    renderRecentFuelAll();
   } catch (error) {
     renderError(error.message);
   }
@@ -49,8 +51,20 @@ async function loadDriverData() {
 }
 
 async function loadRecentFuelAll() {
-  const payload = await apiRequest('recent-fuel.php', { method: 'GET' });
-  recentFuelAll = payload.entries ?? [];
+  try {
+    const payload = await apiRequest('recent-fuel.php', { method: 'GET' });
+    recentFuelAll = payload.entries ?? [];
+    recentFuelAllSection.dataset.error = 'false';
+  } catch (error) {
+    recentFuelAll = [];
+    recentFuelAllSection.dataset.error = 'true';
+    recentFuelAllSection.innerHTML = `
+      <div class="card-header">
+        <h3>Latest fuel entries</h3>
+      </div>
+      <p class="muted">Unable to load recent entries.</p>
+    `;
+  }
 }
 
 logoutButton.addEventListener('click', async () => {
@@ -205,6 +219,9 @@ function renderDriver() {
 }
 
 function renderRecentFuelAll() {
+  if (recentFuelAllSection.dataset.error === 'true') {
+    return;
+  }
   const entries = recentFuelAll.slice(0, 2);
   recentFuelAllSection.innerHTML = `
     <div class="card-header">
