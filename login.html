@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Gas Tank Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Login</p>
+        <h1>Driver access</h1>
+        <p class="subhead">Use the driver password to access all driver pages.</p>
+      </div>
+      <div class="header-actions">
+        <a class="link-button" href="admin.html">Admin login</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <form id="login-form" class="stack">
+          <label for="username">Username</label>
+          <input id="username" type="text" autocomplete="username" required />
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Login</button>
+        </form>
+        <p id="login-error" class="error hidden"></p>
+      </section>
+    </main>
+
+    <script src="common.js"></script>
+    <script src="login.js"></script>
+  </body>
+</html>
