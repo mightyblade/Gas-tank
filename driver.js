@@ -2,7 +2,6 @@ const params = new URLSearchParams(window.location.search);
 const driverId = params.get('id');
 
 const driverName = document.querySelector('#driver-name');
-const driverMeta = document.querySelector('#driver-meta');
 const recentFuelAllSection = document.querySelector('#recent-fuel-all');
 const fuelSection = document.querySelector('#driver-fuel-entry');
 const summarySection = document.querySelector('#driver-summary');
@@ -13,6 +12,7 @@ const logoutButton = document.querySelector('#logout');
 let currentRole = null;
 let driverData = null;
 let recentFuelAll = [];
+let currentGasPrice = 0;
 
 init();
 
@@ -23,6 +23,7 @@ async function init() {
       const demo = demoData();
       driverData = demo.driverDetail;
       recentFuelAll = demo.recentFuel;
+      currentGasPrice = demo.gasPrice;
       renderDriver();
       return;
     }
@@ -33,7 +34,7 @@ async function init() {
       return;
     }
 
-    await loadDriverData();
+    await Promise.all([loadDriverData(), loadCurrentGasPrice()]);
     renderDriver();
     await loadRecentFuelAll();
     renderRecentFuelAll();
@@ -48,6 +49,11 @@ async function loadDriverData() {
   }
   const payload = await apiRequest(`driver.php?id=${driverId}`, { method: 'GET' });
   driverData = payload;
+}
+
+async function loadCurrentGasPrice() {
+  const payload = await apiRequest('gas-price.php', { method: 'GET' });
+  currentGasPrice = payload.gasPrice ?? 0;
 }
 
 async function loadRecentFuelAll() {
@@ -84,8 +90,6 @@ function renderDriver() {
   const { driver, fuelEntries, payments } = driverData;
 
   driverName.textContent = driver.name;
-  driverMeta.textContent = `Driver ID: ${driver.id}`;
-
   renderRecentFuelAll();
 
   const totalFuel = sum(fuelEntries.map((entry) => Number(entry.amount)));
@@ -118,9 +122,9 @@ function renderDriver() {
 
   fuelSection.innerHTML = `
     <form class="stack" id="fuel-form">
-      <h3>Add fuel entry</h3>
+      <h3>Add fuel entry <span class="muted">(Current price: ${formatPrice(currentGasPrice)}/L)</span></h3>
       <label>
-        Amount used
+        Liters
         <input type="number" min="0" step="0.01" name="amount" required />
       </label>
       <label>
@@ -388,7 +392,7 @@ function openEditModal(type, id) {
 
 function renderError(message) {
   driverName.textContent = 'Driver not found';
-  driverMeta.textContent = message;
+  recentFuelAllSection.innerHTML = '';
   recentFuelAllSection.innerHTML = '';
   fuelSection.innerHTML = '';
   summarySection.innerHTML = '';
