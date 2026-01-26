@@ -8,6 +8,9 @@ const summarySection = document.querySelector('#driver-summary');
 const paymentSection = document.querySelector('#driver-payment');
 const historySection = document.querySelector('#driver-history');
 const logoutButton = document.querySelector('#logout');
+const hamburgerMenu = document.querySelector('#hamburger-menu');
+const mobileMenu = document.querySelector('#mobile-menu');
+const logoutMobile = document.querySelector('#logout-mobile');
 
 let currentRole = null;
 let driverData = null;
@@ -80,6 +83,29 @@ logoutButton.addEventListener('click', async () => {
     window.location.href = 'login.html';
   }
 });
+
+// Mobile menu functionality
+if (hamburgerMenu && mobileMenu && logoutMobile) {
+  hamburgerMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileMenu.classList.toggle('active');
+  });
+
+  logoutMobile.addEventListener('click', async () => {
+    try {
+      await apiLogout();
+    } finally {
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (event) => {
+    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+      mobileMenu.classList.remove('active');
+    }
+  });
+}
 
 function renderDriver() {
   if (!driverData) {
@@ -226,45 +252,50 @@ function renderRecentFuelAll() {
   if (recentFuelAllSection.dataset.error === 'true') {
     return;
   }
-  const entries = recentFuelAll.slice(0, 2);
+  const latestEntry = recentFuelAll.slice(0, 1)[0];
   recentFuelAllSection.innerHTML = `
-    <div class="card-header">
-      <h3>Latest fuel entries</h3>
-      <p class="muted">Last 2 fills across all drivers.</p>
+    <div class="card-header card-header-centered">
+      <h3>Last Fuel Entry (please verify)</h3>
     </div>
-    <ul class="history-list" data-history="recent-all"></ul>
+    <div class="latest-liters" data-latest-liters></div>
   `;
 
-  const list = recentFuelAllSection.querySelector("[data-history='recent-all']");
-  list.innerHTML = '';
+  const litersContainer = recentFuelAllSection.querySelector("[data-latest-liters]");
+  litersContainer.innerHTML = '';
 
-  if (!entries.length) {
-    const empty = document.createElement('li');
-    empty.className = 'history-item';
+  if (!latestEntry) {
+    const empty = document.createElement('p');
+    empty.className = 'muted';
     empty.textContent = 'No fuel entries yet.';
-    list.appendChild(empty);
+    litersContainer.appendChild(empty);
     return;
   }
 
-  entries.forEach((entry) => {
-    const listItem = document.createElement('li');
-    listItem.className = 'history-item history-item-row';
-    const reportBody = [
-      'Fuel entry report',
-      `Driver: ${entry.driver_name}`,
-      `Date: ${entry.entry_date}`,
-      `Amount: ${Number(entry.amount).toFixed(2)} liters`,
-      `Price per liter: ${formatPrice(entry.price_per_unit)}`,
-    ].join('\\n');
-    const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
-      'Fuel entry report'
-    )}&body=${encodeURIComponent(reportBody)}`;
-    listItem.innerHTML = `
-      <span>${entry.driver_name} — ${formatFuelEntry(entry)}</span>
-      <a class="link-button danger" href="${mailto}">Report</a>
-    `;
-    list.appendChild(listItem);
-  });
+  const litersDisplay = document.createElement('div');
+  litersDisplay.className = 'latest-liters-display';
+  litersDisplay.innerHTML = `
+    <div class="liters-value">${Number(latestEntry.amount).toFixed(2)}</div>
+    <div class="liters-label">Liters</div>
+  `;
+  litersContainer.appendChild(litersDisplay);
+
+  // Add report button
+  const reportBody = [
+    'Fuel entry report',
+    `Driver: ${latestEntry.driver_name}`,
+    `Date: ${latestEntry.entry_date}`,
+    `Amount: ${Number(latestEntry.amount).toFixed(2)} liters`,
+    `Price per liter: ${formatPrice(latestEntry.price_per_unit)}`,
+  ].join('\\n');
+  const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
+    'Fuel entry report'
+  )}&body=${encodeURIComponent(reportBody)}`;
+  
+  const reportButton = document.createElement('a');
+  reportButton.className = 'link-button danger report-button';
+  reportButton.href = mailto;
+  reportButton.textContent = 'Report';
+  recentFuelAllSection.appendChild(reportButton);
 }
 
 function renderHistory(container, items, type) {
