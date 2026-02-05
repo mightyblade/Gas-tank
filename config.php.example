@@ -1,0 +1,8 @@
+<?php
+// Copy this file to config.php and fill in your DreamHost MySQL credentials.
+return [
+    'db_host' => 'your-mysql-host',
+    'db_name' => 'your-database-name',
+    'db_user' => 'your-database-user',
+    'db_pass' => 'your-database-password',
+];
