@@ -44,17 +44,12 @@ function formatPrice(value) {
   return `$${Number(value).toFixed(4)}`;
 }
 
-function roundPriceForMath(value) {
-  return Number(Number(value).toFixed(2));
-}
-
 function sum(values) {
   return values.reduce((total, value) => total + value, 0);
 }
 
 function formatFuelEntry(entry) {
-  const roundedPrice = roundPriceForMath(entry.price_per_unit);
-  const total = Number(entry.amount) * roundedPrice;
+  const total = Number(entry.amount) * Number(entry.price_per_unit);
   return `${entry.entry_date}: ${Number(entry.amount).toFixed(2)} liters @ ${formatPrice(
     entry.price_per_unit
   )} = ${formatCurrency(total)}`;

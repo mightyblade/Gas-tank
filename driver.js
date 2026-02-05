@@ -60,16 +60,20 @@ async function loadRecentFuelAll() {
   try {
     const payload = await apiRequest('recent-fuel.php', { method: 'GET' });
     recentFuelAll = payload.entries ?? [];
-    recentFuelAllSection.dataset.error = 'false';
+    if (recentFuelAllSection) {
+      recentFuelAllSection.dataset.error = 'false';
+    }
   } catch (error) {
     recentFuelAll = [];
-    recentFuelAllSection.dataset.error = 'true';
-    recentFuelAllSection.innerHTML = `
-      <div class="card-header">
-        <h3>Latest fuel entries</h3>
-      </div>
-      <p class="muted">Unable to load recent entries.</p>
-    `;
+    if (recentFuelAllSection) {
+      recentFuelAllSection.dataset.error = 'true';
+      recentFuelAllSection.innerHTML = `
+        <div class="card-header">
+          <h3>Latest fuel entries</h3>
+        </div>
+        <p class="muted">Unable to load recent entries.</p>
+      `;
+    }
   }
 }
 
@@ -95,7 +99,7 @@ function renderDriver() {
   const totalFuel = sum(fuelEntries.map((entry) => Number(entry.amount)));
   const totalOwed = sum(
     fuelEntries.map(
-      (entry) => Number(entry.amount) * roundPriceForMath(entry.price_per_unit)
+      (entry) => Number(entry.amount) * Number(entry.price_per_unit)
     )
   );
   const totalPaid = sum(payments.map((payment) => Number(payment.amount)));
@@ -225,7 +229,7 @@ function renderDriver() {
 }
 
 function renderRecentFuelAll() {
-  if (recentFuelAllSection.dataset.error === 'true') {
+  if (!recentFuelAllSection || recentFuelAllSection.dataset.error === 'true') {
     return;
   }
   recentFuelAllSection.classList.add('highlight-card');
@@ -393,11 +397,23 @@ function openEditModal(type, id) {
 }
 
 function renderError(message) {
-  driverName.textContent = 'Driver not found';
-  recentFuelAllSection.innerHTML = '';
-  recentFuelAllSection.innerHTML = '';
-  fuelSection.innerHTML = '';
-  summarySection.innerHTML = '';
-  paymentSection.innerHTML = '';
-  historySection.innerHTML = '';
+  if (driverName) {
+    driverName.textContent = 'Driver not found';
+  }
+  if (recentFuelAllSection) {
+    recentFuelAllSection.classList.remove('highlight-card');
+    recentFuelAllSection.innerHTML = '';
+  }
+  if (fuelSection) {
+    fuelSection.innerHTML = '';
+  }
+  if (summarySection) {
+    summarySection.innerHTML = `<p class="error">${message}</p>`;
+  }
+  if (paymentSection) {
+    paymentSection.innerHTML = '';
+  }
+  if (historySection) {
+    historySection.innerHTML = '';
+  }
 }
