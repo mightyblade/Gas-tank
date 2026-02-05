@@ -94,7 +94,9 @@ function renderDriver() {
 
   const totalFuel = sum(fuelEntries.map((entry) => Number(entry.amount)));
   const totalOwed = sum(
-    fuelEntries.map((entry) => Number(entry.amount) * Number(entry.price_per_unit))
+    fuelEntries.map(
+      (entry) => Number(entry.amount) * roundPriceForMath(entry.price_per_unit)
+    )
   );
   const totalPaid = sum(payments.map((payment) => Number(payment.amount)));
   const balance = totalOwed - totalPaid;
@@ -226,11 +228,11 @@ function renderRecentFuelAll() {
   if (recentFuelAllSection.dataset.error === 'true') {
     return;
   }
-  const entries = recentFuelAll.slice(0, 2);
+  recentFuelAllSection.classList.add('highlight-card');
+  const entries = recentFuelAll.slice(0, 1);
   recentFuelAllSection.innerHTML = `
     <div class="card-header">
-      <h3>Latest fuel entries</h3>
-      <p class="muted">Last 2 fills across all drivers.</p>
+      <h3>Last Fuel Entry (please verify)</h3>
     </div>
     <ul class="history-list" data-history="recent-all"></ul>
   `;
@@ -260,7 +262,7 @@ function renderRecentFuelAll() {
       'Fuel entry report'
     )}&body=${encodeURIComponent(reportBody)}`;
     listItem.innerHTML = `
-      <span>${entry.driver_name} — ${formatFuelEntry(entry)}</span>
+      <span>${entry.driver_name}: ${Number(entry.amount).toFixed(2)} liters</span>
       <a class="link-button danger" href="${mailto}">Report</a>
     `;
     list.appendChild(listItem);
