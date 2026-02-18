@@ -48,14 +48,31 @@ function sum(values) {
   return values.reduce((total, value) => total + value, 0);
 }
 
+// Returns today's date as YYYY-MM-DD in Mountain Time (handles MST/MDT automatically)
+function todayLocalDate() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Denver' });
+}
+
+// Formats a YYYY-MM-DD date string for display in Mountain Time (e.g. "Mar 10, 2024")
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    timeZone: 'America/Denver',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 function formatFuelEntry(entry) {
-  return `${entry.entry_date}: ${Number(entry.amount).toFixed(2)} liters @ ${formatPrice(
+  const total = Number(entry.amount) * Number(entry.price_per_unit);
+  return `${formatDate(entry.entry_date)}: ${Number(entry.amount).toFixed(2)} liters @ ${formatPrice(
     entry.price_per_unit
-  )} = ${formatCurrency(entry.amount * entry.price_per_unit)}`;
+  )} = ${formatCurrency(total)}`;
 }
 
 function formatPayment(payment) {
-  return `${payment.entry_date}: ${formatCurrency(payment.amount)} paid`;
+  return `${formatDate(payment.entry_date)}: ${formatCurrency(payment.amount)} paid`;
 }
 
 function shouldUseDemoData() {

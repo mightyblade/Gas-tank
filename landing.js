@@ -1,7 +1,8 @@
 const driverList = document.querySelector('#driver-list');
 const currentPrice = document.querySelector('#current-price');
 const logoutButton = document.querySelector('#logout');
-const recentFuelList = document.querySelector('#recent-fuel-list');
+const lastFuelAmount = document.querySelector('#last-fuel-amount');
+const lastFuelReport = document.querySelector('#last-fuel-report');
 
 init();
 
@@ -44,7 +45,7 @@ logoutButton.addEventListener('click', async () => {
 
 function renderLanding(data) {
   currentPrice.textContent = formatPrice(data.gasPrice);
-  renderRecentFuel(data.recentFuel);
+  renderLastFuel(data.recentFuel);
   driverList.innerHTML = '';
 
   if (data.drivers.length === 0) {
@@ -78,22 +79,31 @@ function renderLanding(data) {
   });
 }
 
-function renderRecentFuel(entries = []) {
-  recentFuelList.innerHTML = '';
+function renderLastFuel(entries = []) {
+  lastFuelAmount.textContent = 'No entries';
+  lastFuelReport.innerHTML = '';
+  
   if (!entries.length) {
-    const empty = document.createElement('li');
-    empty.className = 'history-item';
-    empty.textContent = 'No fuel entries yet.';
-    recentFuelList.appendChild(empty);
     return;
   }
 
-  entries.forEach((entry) => {
-    const item = document.createElement('li');
-    item.className = 'history-item';
-    item.textContent = `${entry.driver_name} — ${formatFuelEntry(entry)}`;
-    recentFuelList.appendChild(item);
-  });
+  const lastEntry = entries[0]; // Get the most recent entry
+  lastFuelAmount.textContent = Number(lastEntry.amount).toFixed(1);
+  
+  // Create report button
+  const reportBody = [
+    'Fuel entry report',
+    `Driver: ${lastEntry.driver_name}`,
+    `Date: ${formatDate(lastEntry.entry_date)}`,
+    `Amount: ${Number(lastEntry.amount).toFixed(2)} liters`,
+    `Price per liter: ${formatPrice(lastEntry.price_per_unit)}`,
+  ].join('\n');
+  
+  const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
+    'Fuel entry report'
+  )}&body=${encodeURIComponent(reportBody)}`;
+  
+  lastFuelReport.innerHTML = `<a class="link-button" href="${mailto}" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Report</a>`;
 }
 
 function renderError(message) {

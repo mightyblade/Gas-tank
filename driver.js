@@ -199,8 +199,8 @@ function renderDriver() {
   const paymentForm = document.querySelector('#payment-form');
   const fuelDateInput = fuelForm.querySelector("input[name='date']");
   const paymentDateInput = paymentForm.querySelector("input[name='date']");
-  fuelDateInput.valueAsDate = new Date();
-  paymentDateInput.valueAsDate = new Date();
+  fuelDateInput.value = todayLocalDate();
+  paymentDateInput.value = todayLocalDate();
 
   fuelForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -289,7 +289,7 @@ function renderRecentFuelAll() {
   const reportBody = [
     'Fuel entry report',
     `Driver: ${latestEntry.driver_name}`,
-    `Date: ${latestEntry.entry_date}`,
+    `Date: ${formatDate(latestEntry.entry_date)}`,
     `Amount: ${Number(latestEntry.amount).toFixed(2)} liters`,
     `Price per liter: ${formatPrice(latestEntry.price_per_unit)}`,
   ].join('\n');
@@ -302,69 +302,6 @@ function renderRecentFuelAll() {
   reportButton.href = mailto;
   reportButton.textContent = 'Report';
   recentFuelAllSection.appendChild(reportButton);
-      <h3>Last Fuel Entry (please verify)</h3>
-    </div>
-    <div class="latest-liters" data-latest-liters></div>
-  `;
-
-  const litersContainer = recentFuelAllSection.querySelector("[data-latest-liters]");
-  litersContainer.innerHTML = '';
-
-  if (!latestEntry) {
-    const empty = document.createElement('p');
-    empty.className = 'muted';
-    empty.textContent = 'No fuel entries yet.';
-    litersContainer.appendChild(empty);
-    return;
-  }
-
-<<<<<<< HEAD
-  const litersDisplay = document.createElement('div');
-  litersDisplay.className = 'latest-liters-display';
-  litersDisplay.innerHTML = `
-    <div class="liters-value">${Number(latestEntry.amount).toFixed(2)}</div>
-    <div class="liters-label">Liters</div>
-  `;
-  litersContainer.appendChild(litersDisplay);
-
-  // Add report button
-  const reportBody = [
-    'Fuel entry report',
-    `Driver: ${latestEntry.driver_name}`,
-    `Date: ${latestEntry.entry_date}`,
-    `Amount: ${Number(latestEntry.amount).toFixed(2)} liters`,
-    `Price per liter: ${formatPrice(latestEntry.price_per_unit)}`,
-  ].join('\\n');
-  const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
-    'Fuel entry report'
-  )}&body=${encodeURIComponent(reportBody)}`;
-  
-  const reportButton = document.createElement('a');
-  reportButton.className = 'link-button danger report-button';
-  reportButton.href = mailto;
-  reportButton.textContent = 'Report';
-  recentFuelAllSection.appendChild(reportButton);
-=======
-  entries.forEach((entry) => {
-    const listItem = document.createElement('li');
-    listItem.className = 'history-item history-item-row';
-    const reportBody = [
-      'Fuel entry report',
-      `Driver: ${entry.driver_name}`,
-      `Date: ${entry.entry_date}`,
-      `Amount: ${Number(entry.amount).toFixed(2)} liters`,
-      `Price per liter: ${formatPrice(entry.price_per_unit)}`,
-    ].join('\\n');
-    const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
-      'Fuel entry report'
-    )}&body=${encodeURIComponent(reportBody)}`;
-    listItem.innerHTML = `
-      <span>${entry.driver_name}: ${Number(entry.amount).toFixed(2)} liters</span>
-      <a class="link-button danger" href="${mailto}">Report</a>
-    `;
-    list.appendChild(listItem);
-  });
->>>>>>> origin/main
 }
 
 function renderHistory(container, items, type) {

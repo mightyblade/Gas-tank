@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gas Tank Tracker</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Gas Tank Tracker - UPDATED</title>
+    <link rel="stylesheet" href="styles.css?v=1" />
   </head>
   <body>
     <header class="hero">
@@ -30,12 +30,15 @@
     </header>
 
     <main>
-      <section class="card" id="recent-fuel-section">
+      <section class="card highlighted-card" id="recent-fuel-section">
         <div class="card-header">
-          <h2>Recent fuel entries</h2>
-          <p class="muted">Latest activity across all drivers.</p>
+          <h2>Last FUEL Entry:</h2>
         </div>
-        <ul id="recent-fuel-list" class="history-list"></ul>
+        <div id="last-fuel-display" class="last-fuel-display">
+          <span id="last-fuel-amount" class="last-fuel-amount">No entries</span>
+          <span class="last-fuel-unit">liters</span>
+        </div>
+        <div id="last-fuel-report" class="report-section"></div>
       </section>
       <section>
         <div class="section-header">
@@ -46,7 +49,7 @@
       </section>
     </main>
 
-    <script src="common.js"></script>
-    <script src="landing.js"></script>
+    <script src="common.js?v=1"></script>
+    <script src="landing.js?v=1"></script>
   </body>
 </html>
