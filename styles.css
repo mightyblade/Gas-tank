@@ -392,6 +392,30 @@ button.danger:hover {
   display: none;
 }
 
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 16px);
+  background: #16a34a;
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+  max-width: min(90vw, 360px);
+  text-align: center;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* Hamburger menu - hidden by default on desktop */
 .hamburger-menu {
   display: none;

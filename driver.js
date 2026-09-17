@@ -16,6 +16,25 @@ let currentRole = null;
 let driverData = null;
 let recentFuelAll = [];
 let currentGasPrice = 0;
+let toastTimeoutId = null;
+
+function showToast(message) {
+  let toast = document.querySelector('#toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('visible');
+  clearTimeout(toastTimeoutId);
+  toastTimeoutId = setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3000);
+}
 
 init();
 
@@ -222,8 +241,9 @@ function renderDriver() {
         }),
       });
     });
-    await loadDriverData();
+    await Promise.all([loadDriverData(), loadRecentFuelAll()]);
     renderDriver();
+    showToast('We have logged your fuel entry.');
   });
 
   paymentForm.addEventListener('submit', async (event) => {
