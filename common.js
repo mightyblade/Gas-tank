@@ -96,11 +96,15 @@ function demoData() {
       },
     ],
     driverDetail: {
-      driver: { id: 1, name: 'Alex' },
+      driver: { id: 1, name: 'Alex', tank_size: 80, starting_fuel_level: 40, current_fuel_level: 35 },
+      vehicles: [
+        { id: 1, driver_id: 1, name: 'Truck', stats: { total: { amount: 150, cost: 517.5 }, currentMonth: { amount: 45, cost: 155.25 }, lastMonth: { amount: 30, cost: 103.5 }, currentYear: { amount: 75, cost: 258.75 }, lastYear: { amount: 200, cost: 690 } } },
+        { id: 2, driver_id: 1, name: 'Car', stats: { total: { amount: 80, cost: 276 }, currentMonth: { amount: 20, cost: 69 }, lastMonth: { amount: 15, cost: 51.75 }, currentYear: { amount: 35, cost: 120.75 }, lastYear: { amount: 100, cost: 345 } } }
+      ],
       fuelEntries: [
-        { id: 3, amount: 7.0, entry_date: '2024-03-12', price_per_unit: 3.45 },
-        { id: 2, amount: 8.5, entry_date: '2024-03-01', price_per_unit: 3.35 },
-        { id: 1, amount: 12.5, entry_date: '2024-02-10', price_per_unit: 3.25 },
+        { id: 3, vehicle_id: 1, amount: 7.0, entry_date: '2024-03-12', price_per_unit: 3.45 },
+        { id: 2, vehicle_id: 2, amount: 8.5, entry_date: '2024-03-01', price_per_unit: 3.35 },
+        { id: 1, vehicle_id: 1, amount: 12.5, entry_date: '2024-02-10', price_per_unit: 3.25 },
       ],
       payments: [{ id: 1, amount: 20.0, entry_date: '2024-03-15' }],
     },

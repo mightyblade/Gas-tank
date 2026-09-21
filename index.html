@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gas Tank Tracker - UPDATED</title>
-    <link rel="stylesheet" href="styles.css?v=1" />
+    <link rel="stylesheet" href="styles.css?v=2" />
   </head>
   <body>
     <header class="hero">
@@ -16,30 +16,34 @@
           keep balances in sync.
         </p>
       </div>
-      <div class="price-card">
-        <h2>Current gas price</h2>
-        <div class="price-row">
-          <span class="price-label">$ / liter</span>
-          <span id="current-price" class="price-value">0.00</span>
+      <div class="hero-main">
+        <div class="price-card">
+          <h2>Current gas price</h2>
+          <div class="price-row">
+            <span class="price-label">$ / liter</span>
+            <span id="current-price" class="price-value">0.00</span>
+          </div>
+          <div class="hero-actions">
+            <a class="link-button" href="admin.html">Admin settings</a>
+            <button id="logout" type="button">Log out</button>
+          </div>
         </div>
-        <div class="hero-actions">
-          <a class="link-button" href="admin.html">Admin settings</a>
-          <button id="logout" type="button">Log out</button>
+        <div class="tank-card" id="tank-card">
+          <h2>Communal Fuel Tank</h2>
+          <div class="tank-display">
+            <div class="tank-icon-lg">
+              <div class="tank-fill-lg" id="tank-fill"></div>
+            </div>
+            <div class="tank-stats">
+              <span class="tank-percent-lg" id="tank-percent">0%</span>
+              <span class="tank-liters" id="tank-liters">0 / 0 L</span>
+            </div>
+          </div>
         </div>
       </div>
     </header>
 
     <main>
-      <section class="card highlighted-card" id="recent-fuel-section">
-        <div class="card-header">
-          <h2>Last FUEL Entry:</h2>
-        </div>
-        <div id="last-fuel-display" class="last-fuel-display">
-          <span id="last-fuel-amount" class="last-fuel-amount">No entries</span>
-          <span class="last-fuel-unit">liters</span>
-        </div>
-        <div id="last-fuel-report" class="report-section"></div>
-      </section>
       <section>
         <div class="section-header">
           <h2>Drivers</h2>
@@ -49,7 +53,7 @@
       </section>
     </main>
 
-    <script src="common.js?v=1"></script>
-    <script src="landing.js?v=1"></script>
+    <script src="common.js?v=2"></script>
+    <script src="landing.js?v=2"></script>
   </body>
 </html>

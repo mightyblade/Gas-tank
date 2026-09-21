@@ -38,6 +38,55 @@
         </div>
 
         <div class="card">
+          <h2>Communal Fuel Tank</h2>
+          <div class="tank-admin-display">
+            <div class="tank-icon-lg">
+              <div class="tank-fill-lg" id="admin-tank-fill"></div>
+            </div>
+            <div class="tank-admin-stats">
+              <span class="tank-percent-lg" id="admin-tank-percent">0%</span>
+              <span class="tank-liters" id="admin-tank-liters">0 / 0 L</span>
+            </div>
+          </div>
+          <form id="tank-form" class="stack">
+            <label for="tank-size">Tank Size (liters)</label>
+            <input id="tank-size" type="number" min="0" step="1" />
+            <label for="tank-level">Current Fuel Level (liters)</label>
+            <input id="tank-level" type="number" min="0" step="0.1" />
+            <button type="button" id="update-tank-btn">Update Tank</button>
+          </form>
+          <form id="refill-form" class="stack">
+            <label for="refill-amount">Add Fuel (refill tank)</label>
+            <input id="refill-amount" type="number" min="0" step="0.1" />
+            <button type="submit" class="button-danger">Add Fuel</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Fuel Cost vs Payments</h2>
+          <div id="fuel-summary">
+            <div class="fuel-summary-grid">
+              <div class="fuel-summary-item">
+                <span class="fuel-summary-label">Total Fuel Cost</span>
+                <span class="fuel-summary-value" id="total-fuel-cost">$0.00</span>
+              </div>
+              <div class="fuel-summary-item">
+                <span class="fuel-summary-label">Total Liters</span>
+                <span class="fuel-summary-value" id="total-liters">0.00 L</span>
+              </div>
+              <div class="fuel-summary-item">
+                <span class="fuel-summary-label">Total Paid</span>
+                <span class="fuel-summary-value" id="total-paid">$0.00</span>
+              </div>
+              <div class="fuel-summary-item">
+                <span class="fuel-summary-label">Balance Owed</span>
+                <span class="fuel-summary-value" id="balance-owed">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
           <h2>Add a driver</h2>
           <form id="user-form" class="stack">
             <label for="user-name">Driver name</label>

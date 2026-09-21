@@ -1,8 +1,6 @@
 const driverList = document.querySelector('#driver-list');
 const currentPrice = document.querySelector('#current-price');
 const logoutButton = document.querySelector('#logout');
-const lastFuelAmount = document.querySelector('#last-fuel-amount');
-const lastFuelReport = document.querySelector('#last-fuel-report');
 
 init();
 
@@ -19,16 +17,16 @@ async function init() {
       return;
     }
 
-    const [pricePayload, driversPayload, recentFuelPayload] = await Promise.all([
+    const [pricePayload, driversPayload, tankPayload] = await Promise.all([
       apiRequest('gas-price.php', { method: 'GET' }),
       apiRequest('drivers.php', { method: 'GET' }),
-      apiRequest('recent-fuel.php', { method: 'GET' }),
+      apiRequest('tank.php', { method: 'GET' }),
     ]);
 
     renderLanding({
       gasPrice: pricePayload.gasPrice,
       drivers: driversPayload.drivers,
-      recentFuel: recentFuelPayload.entries,
+      tank: tankPayload,
     });
   } catch (error) {
     renderError(error.message);
@@ -45,7 +43,7 @@ logoutButton.addEventListener('click', async () => {
 
 function renderLanding(data) {
   currentPrice.textContent = formatPrice(data.gasPrice);
-  renderLastFuel(data.recentFuel);
+  renderTank(data.tank);
   driverList.innerHTML = '';
 
   if (data.drivers.length === 0) {
@@ -79,31 +77,21 @@ function renderLanding(data) {
   });
 }
 
-function renderLastFuel(entries = []) {
-  lastFuelAmount.textContent = 'No entries';
-  lastFuelReport.innerHTML = '';
-  
-  if (!entries.length) {
-    return;
-  }
+function renderTank(tank) {
+  const tankCard = document.getElementById('tank-card');
+  if (!tankCard) return;
 
-  const lastEntry = entries[0]; // Get the most recent entry
-  lastFuelAmount.textContent = Number(lastEntry.amount).toFixed(1);
-  
-  // Create report button
-  const reportBody = [
-    'Fuel entry report',
-    `Driver: ${lastEntry.driver_name}`,
-    `Date: ${formatDate(lastEntry.entry_date)}`,
-    `Amount: ${Number(lastEntry.amount).toFixed(2)} liters`,
-    `Price per liter: ${formatPrice(lastEntry.price_per_unit)}`,
-  ].join('\n');
-  
-  const mailto = `mailto:brentjohnpeterson@gmail.com?subject=${encodeURIComponent(
-    'Fuel entry report'
-  )}&body=${encodeURIComponent(reportBody)}`;
-  
-  lastFuelReport.innerHTML = `<a class="link-button" href="${mailto}" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Report</a>`;
+  const tankSize = tank?.tank_size || 0;
+  const currentLevel = tank?.current_fuel_level || 0;
+  const percent = tankSize > 0 ? Math.min(100, Math.max(0, (currentLevel / tankSize) * 100)) : 0;
+
+  const tankFill = document.getElementById('tank-fill');
+  const tankPercent = document.getElementById('tank-percent');
+  const tankLiters = document.getElementById('tank-liters');
+
+  if (tankFill) tankFill.style.height = percent + '%';
+  if (tankPercent) tankPercent.textContent = percent.toFixed(0) + '%';
+  if (tankLiters) tankLiters.textContent = currentLevel.toFixed(1) + ' / ' + tankSize.toFixed(0) + ' L';
 }
 
 function renderError(message) {

@@ -2,6 +2,7 @@ const params = new URLSearchParams(window.location.search);
 const driverId = params.get('id');
 
 const driverName = document.querySelector('#driver-name');
+const vehiclesSection = document.querySelector('#vehicles-section');
 const recentFuelAllSection = document.querySelector('#recent-fuel-all');
 const fuelSection = document.querySelector('#driver-fuel-entry');
 const summarySection = document.querySelector('#driver-summary');
@@ -34,6 +35,18 @@ function showToast(message) {
   toastTimeoutId = setTimeout(() => {
     toast.classList.remove('visible');
   }, 3000);
+}
+
+function formatFuelEntry(entry) {
+  const total = Number(entry.amount) * Number(entry.price_per_unit);
+  const vehicles = driverData?.vehicles || [];
+  const vehicleName = entry.vehicle_id 
+    ? (vehicles.find(v => String(v.id) === String(entry.vehicle_id))?.name || 'Unknown')
+    : null;
+  const vehicleStr = vehicleName ? ` [${vehicleName}]` : '';
+  return `${formatDate(entry.entry_date)}: ${Number(entry.amount).toFixed(2)} liters @ ${formatPrice(
+    entry.price_per_unit
+  )} = ${formatCurrency(total)}${vehicleStr}`;
 }
 
 init();
@@ -136,7 +149,7 @@ function renderDriver() {
     return;
   }
 
-  const { driver, fuelEntries, payments } = driverData;
+  const { driver, fuelEntries, payments, vehicles } = driverData;
 
   driverName.textContent = driver.name;
   renderRecentFuelAll();
@@ -175,6 +188,12 @@ function renderDriver() {
     <form class="stack" id="fuel-form">
       <h3>Add fuel entry <span class="muted">(Current price: ${formatPrice(currentGasPrice)}/L)</span></h3>
       <label>
+        Vehicle
+        <select name="vehicle" id="fuel-vehicle-select">
+          <option value="">No vehicle</option>
+        </select>
+      </label>
+      <label>
         Liters
         <input type="number" min="0" step="0.01" name="amount" required />
       </label>
@@ -202,6 +221,12 @@ function renderDriver() {
   `;
 
   historySection.innerHTML = `
+    <div class="history-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="10">Last 10</button>
+      <button class="filter-btn" data-filter="30">Last 30</button>
+      <button class="filter-btn" data-filter="90">Last 90 days</button>
+    </div>
     <div class="user-history">
       <div>
         <h3>Fuel history</h3>
@@ -213,6 +238,18 @@ function renderDriver() {
       </div>
     </div>
   `;
+
+  let currentFilter = 'all';
+
+  historySection.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      historySection.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderHistory(document.querySelector("[data-history='fuel']"), fuelEntries, 'fuel', currentFilter);
+      renderHistory(document.querySelector("[data-history='payment']"), payments, 'payment', currentFilter);
+    });
+  });
 
   const fuelForm = document.querySelector('#fuel-form');
   const paymentForm = document.querySelector('#payment-form');
@@ -227,6 +264,7 @@ function renderDriver() {
       fuelForm.querySelector("input[name='amount']").value
     );
     const date = fuelDateInput.value;
+    const vehicleId = fuelForm.querySelector("select[name='vehicle']").value;
     if (!amount || !date) {
       return;
     }
@@ -238,6 +276,7 @@ function renderDriver() {
           amount,
           date,
           pricePerUnit: payload.gasPrice,
+          vehicleId: vehicleId || null,
         }),
       });
     });
@@ -270,8 +309,16 @@ function renderDriver() {
   const fuelHistory = document.querySelector("[data-history='fuel']");
   const paymentHistory = document.querySelector("[data-history='payment']");
 
-  renderHistory(fuelHistory, fuelEntries, 'fuel');
-  renderHistory(paymentHistory, payments, 'payment');
+  renderHistory(fuelHistory, fuelEntries, 'fuel', 'all');
+  renderHistory(paymentHistory, payments, 'payment', 'all');
+
+  const fuelVehicleSelect = document.querySelector('#fuel-vehicle-select');
+  if (fuelVehicleSelect) {
+    const vehicleOptions = vehicles.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+    fuelVehicleSelect.innerHTML = `<option value="">No vehicle</option>${vehicleOptions}`;
+  }
+
+  renderVehicles(vehicles);
 }
 
 function renderRecentFuelAll() {
@@ -324,7 +371,133 @@ function renderRecentFuelAll() {
   recentFuelAllSection.appendChild(reportButton);
 }
 
-function renderHistory(container, items, type) {
+function renderVehicles(vehicles) {
+  if (!vehiclesSection) return;
+
+  vehiclesSection.innerHTML = `
+    <div class="card-header">
+      <h3>My Vehicles</h3>
+      <button type="button" id="add-vehicle-btn" class="link-button">Add Vehicle</button>
+    </div>
+    <div class="vehicles-list" id="vehicles-list"></div>
+  `;
+
+  const vehiclesList = vehiclesSection.querySelector('#vehicles-list');
+  
+  if (vehicles.length === 0) {
+    vehiclesList.innerHTML = '<p class="muted">No vehicles yet. Add one to start tracking fuel by vehicle.</p>';
+  } else {
+    vehiclesList.innerHTML = vehicles.map(vehicle => `
+      <div class="vehicle-card">
+        <div class="vehicle-header">
+          <h4>${vehicle.name}</h4>
+          <div class="vehicle-actions">
+            <button class="link-button" data-edit-vehicle="${vehicle.id}">Edit</button>
+            <button class="link-button danger" data-delete-vehicle="${vehicle.id}">Delete</button>
+          </div>
+        </div>
+        <div class="vehicle-stats">
+          <div class="vehicle-stat">
+            <span class="stat-label">Current Month</span>
+            <span class="stat-value">${vehicle.stats.currentMonth.amount.toFixed(2)} L (${formatCurrency(vehicle.stats.currentMonth.cost)})</span>
+          </div>
+          <div class="vehicle-stat">
+            <span class="stat-label">Last Month</span>
+            <span class="stat-value">${vehicle.stats.lastMonth.amount.toFixed(2)} L (${formatCurrency(vehicle.stats.lastMonth.cost)})</span>
+          </div>
+          <div class="vehicle-stat">
+            <span class="stat-label">Current Year</span>
+            <span class="stat-value">${vehicle.stats.currentYear ? vehicle.stats.currentYear.amount.toFixed(2) : '0.00'} L (${formatCurrency(vehicle.stats.currentYear ? vehicle.stats.currentYear.cost : 0)})</span>
+          </div>
+          <div class="vehicle-stat">
+            <span class="stat-label">Last Year</span>
+            <span class="stat-value">${vehicle.stats.lastYear.amount.toFixed(2)} L (${formatCurrency(vehicle.stats.lastYear.cost)})</span>
+          </div>
+          <div class="vehicle-stat">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">${vehicle.stats.total.amount.toFixed(2)} L (${formatCurrency(vehicle.stats.total.cost)})</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const addVehicleBtn = vehiclesSection.querySelector('#add-vehicle-btn');
+  addVehicleBtn.addEventListener('click', () => openVehicleModal());
+
+  vehiclesSection.querySelectorAll('[data-edit-vehicle]').forEach(button => {
+    button.addEventListener('click', () => {
+      const vehicleId = button.getAttribute('data-edit-vehicle');
+      const vehicle = vehicles.find(v => String(v.id) === String(vehicleId));
+      openVehicleModal(vehicle);
+    });
+  });
+
+  vehiclesSection.querySelectorAll('[data-delete-vehicle]').forEach(button => {
+    button.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to delete this vehicle? Fuel entries will not be deleted but will no longer be associated with a vehicle.')) {
+        return;
+      }
+      const vehicleId = button.getAttribute('data-delete-vehicle');
+      await apiRequest(`vehicles.php?id=${vehicleId}`, { method: 'DELETE' });
+      await loadDriverData();
+      renderDriver();
+    });
+  });
+}
+
+function openVehicleModal(vehicle = null) {
+  const isEdit = !!vehicle;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <h3>${isEdit ? 'Edit Vehicle' : 'Add Vehicle'}</h3>
+      <form class="stack" id="vehicle-form">
+        <label>
+          Vehicle Name
+          <input type="text" name="name" required value="${vehicle?.name || ''}" placeholder="e.g., Truck, Car, Van" />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="link-button danger" data-cancel>Cancel</button>
+          <button type="submit">${isEdit ? 'Save' : 'Add'}</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const removeModal = () => modal.remove();
+  modal.querySelector('[data-cancel]').addEventListener('click', removeModal);
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal) removeModal();
+  });
+
+  modal.querySelector('#vehicle-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const name = modal.querySelector("input[name='name']").value.trim();
+    if (!name) return;
+
+    if (isEdit) {
+      await apiRequest(`vehicles.php?id=${vehicle.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ name }),
+      });
+    } else {
+      await apiRequest('vehicles.php', {
+        method: 'POST',
+        body: JSON.stringify({ driverId, name }),
+      });
+    }
+    
+    await loadDriverData();
+    renderDriver();
+    removeModal();
+  });
+}
+
+function renderHistory(container, items, type, filter = 'all') {
   container.innerHTML = '';
   if (items.length === 0) {
     const empty = document.createElement('li');
@@ -334,26 +507,34 @@ function renderHistory(container, items, type) {
     return;
   }
 
-  items.forEach((item) => {
+  let filteredItems = items;
+  
+  if (filter !== 'all') {
+    const days = parseInt(filter);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    filteredItems = items.filter(item => {
+      const itemDate = new Date(item.entry_date);
+      return itemDate >= cutoffDate;
+    });
+  }
+
+  filteredItems.forEach((item) => {
     const listItem = document.createElement('li');
     listItem.className = 'history-item history-item-row';
     const content = type === 'fuel' ? formatFuelEntry(item) : formatPayment(item);
     listItem.innerHTML = `
       <span>${content}</span>
-      ${
-        currentRole === 'admin'
-          ? `<div class="history-actions">
-              <button class="link-button" data-edit="${item.id}" data-type="${type}">Edit</button>
-              <button class="link-button danger" data-delete="${item.id}" data-type="${type}">Delete</button>
-            </div>`
-          : ''
-      }
+      <div class="history-actions">
+        <button class="link-button" data-edit="${item.id}" data-type="${type}">Edit</button>
+        <button class="link-button danger" data-delete="${item.id}" data-type="${type}">Delete</button>
+      </div>
     `;
     container.appendChild(listItem);
   });
 
-  if (currentRole === 'admin') {
-    container.querySelectorAll('[data-edit]').forEach((button) => {
+  container.querySelectorAll('[data-edit]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.getAttribute('data-edit');
         const entryType = button.getAttribute('data-type');
@@ -370,7 +551,6 @@ function renderHistory(container, items, type) {
         renderDriver();
       });
     });
-  }
 }
 
 function openEditModal(type, id) {
@@ -382,12 +562,28 @@ function openEditModal(type, id) {
     return;
   }
 
+  const vehicles = driverData.vehicles || [];
+  const vehicleOptions = vehicles.map(v => 
+    `<option value="${v.id}" ${String(entry.vehicle_id) === String(v.id) ? 'selected' : ''}>${v.name}</option>`
+  ).join('');
+
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `
     <div class="modal">
       <h3>Edit ${type === 'fuel' ? 'fuel entry' : 'payment'}</h3>
       <form class="stack" id="edit-form">
+        ${
+          type === 'fuel'
+            ? `<label>
+                Vehicle
+                <select name="vehicle">
+                  <option value="">No vehicle</option>
+                  ${vehicleOptions}
+                </select>
+              </label>`
+            : ''
+        }
         <label>
           Amount
           <input type="number" min="0" step="0.01" name="amount" required value="${entry.amount}" />
@@ -434,6 +630,8 @@ function openEditModal(type, id) {
     };
     if (type === 'fuel') {
       payload.pricePerUnit = Number.parseFloat(formData.get('price'));
+      const vehicleId = formData.get('vehicle');
+      payload.vehicleId = vehicleId ? vehicleId : null;
     }
 
     const endpoint = type === 'fuel' ? 'fuel-entries.php' : 'payments.php';

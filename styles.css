@@ -309,6 +309,33 @@ button.danger:hover {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.history-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d7dbea;
+  background: #fff;
+  color: #4b5065;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  background: #f3f4f9;
+}
+
+.filter-btn.active {
+  background: #3f5efb;
+  color: #fff;
+  border-color: #3f5efb;
+}
+
 .history-list {
   list-style: none;
   margin: 0;
@@ -592,4 +619,243 @@ button.danger:hover {
     position: absolute !important;
     left: -9999px !important;
   }
+}
+
+.vehicles-list {
+  display: grid;
+  gap: 16px;
+}
+
+.vehicle-card {
+  background: #f3f4f9;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.vehicle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.vehicle-header h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.vehicle-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.vehicle-actions .link-button,
+.vehicle-actions button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.vehicle-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.vehicle-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fuel-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.fuel-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fuel-summary-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fuel-summary-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.driver-tank-settings {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.driver-tank-settings h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.tank-icon-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f3f4f9;
+  border-radius: 12px;
+}
+
+.tank-icon {
+  width: 40px;
+  height: 56px;
+  border: 3px solid #1d2132;
+  border-radius: 4px;
+  position: relative;
+  background: #fff;
+  overflow: hidden;
+}
+
+.tank-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #3f5efb;
+  transition: height 0.3s ease;
+}
+
+.tank-icon::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 8px;
+  background: #1d2132;
+  border-radius: 2px 2px 0 0;
+}
+
+.tank-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tank-percent {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.tank-details {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.tank-update-link {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.hero-main {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tank-card {
+  background: #111827;
+  color: #f9fafb;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.2);
+  min-width: 200px;
+}
+
+.tank-card h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.tank-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tank-icon-lg {
+  width: 50px;
+  height: 70px;
+  border: 3px solid #f9fafb;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tank-fill-lg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #3f5efb;
+  transition: height 0.3s ease;
+}
+
+.tank-stats {
+  display: flex;
+  flex-direction: column;
+}
+
+.tank-percent-lg {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tank-liters {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.tank-admin-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f3f4f9;
+  border-radius: 12px;
+}
+
+.tank-admin-stats {
+  display: flex;
+  flex-direction: column;
+}
+
+.tank-admin-stats .tank-percent-lg {
+  font-size: 32px;
+  color: #1d2132;
+}
+
+.tank-admin-stats .tank-liters {
+  color: #4b5065;
 }
