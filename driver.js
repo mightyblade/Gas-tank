@@ -280,9 +280,16 @@ function renderDriver() {
         }),
       });
     });
-    await Promise.all([loadDriverData(), loadRecentFuelAll()]);
-    renderDriver();
+    // The entry is already saved at this point, so confirm it right away —
+    // don't let a refresh failure (network hiccup, etc.) hide the fact that
+    // the log succeeded.
     showToast('We have logged your fuel entry.');
+    try {
+      await Promise.all([loadDriverData(), loadRecentFuelAll()]);
+      renderDriver();
+    } catch (error) {
+      console.error('Fuel entry was logged, but refreshing the page failed:', error);
+    }
   });
 
   paymentForm.addEventListener('submit', async (event) => {

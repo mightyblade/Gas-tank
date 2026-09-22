@@ -16,14 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $pdo->prepare('INSERT INTO fuel_entries (driver_id, vehicle_id, amount, entry_date, price_per_unit) VALUES (?, ?, ?, ?, ?)');
     $stmt->execute([$driverId, $vehicleId ? $vehicleId : null, $amount, $date, $price]);
-    
+    // Capture the id immediately — running another query (even a SELECT) before
+    // lastInsertId() can reset it back to 0 on this PDO/mysqlnd combination.
+    $newEntryId = $pdo->lastInsertId();
+
     $currentFuelLevel = get_setting($pdo, 'current_fuel_level');
     if ($currentFuelLevel !== null) {
         $newLevel = floatval($currentFuelLevel) - floatval($amount);
         set_setting($pdo, 'current_fuel_level', $newLevel);
     }
-    
-    respond(['id' => $pdo->lastInsertId()]);
+
+    respond(['id' => $newEntryId]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
